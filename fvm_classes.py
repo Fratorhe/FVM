@@ -235,7 +235,7 @@ class AdvectionDiffusionModel(object):
         conditions. Otherwise for a fully Neumann (or Robin) system it is equal to 
         the identity matrix."""
         a1 = 0 if self.left_flux is None else 1
-        aJ = 0 if self.left_flux is None else 1
+        aJ = 0 if self.right_flux is None else 1
         diagonals = np.ones(self.mesh.J)
         diagonals[0]  = a1
         diagonals[-1] = aJ
@@ -374,7 +374,6 @@ if __name__ == '__main__':
     
     # Construct linear system from discretised matrices, A.x = d
     A = I - k*theta*alpha*M
-    d = (I + k*(1-theta)*alpha*M)*w_init + beta
     
     print "Peclet number", np.min(model.peclet_number()), np.max(model.peclet_number())
     print "CFL condition", np.min(model.CFL_condition()), np.max(model.CFL_condition())
@@ -407,7 +406,7 @@ if __name__ == '__main__':
     
         for i in range(201):
             #w = linalg.spsolve(A.tocsc(), M * w + s)
-            d = (I + k*(1-theta)*alpha*M)*w + beta
+            d = (I + k*(1-theta)*alpha*M)*w + beta * k
             w = linalg.spsolve(A, d)
         
             if  i == 0:
